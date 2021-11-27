@@ -17,7 +17,9 @@ VLSM + CIDR
 ![topologi-cpt.png](img/topologi-cpt.png)
 
 Kelompok kami mengerjakan teknik **VLSM pada CPT**, sedangkan teknik **CIDR pada UML**.
+
 | Subnet | IP | Subnet mask | netmask | Jumlah |
+|---|---|---|---|---|
 |A1 (Fukurou) | 192.174.27.164 | 255.255.255.252 | /30 | 2 |
 |A2 (Doriki) | 192.174.27.160 | 255.255.255.252 | /30 | 2 |
 |A3 (Jorge) | 192.174.27.128 | 255.255.255.240 | /28 | 13 |
