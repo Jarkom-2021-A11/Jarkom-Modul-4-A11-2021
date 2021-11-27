@@ -100,4 +100,207 @@ Untuk routing pada CPT, diberikan static route pada semua router yang ada dengan
 0.0.0.0/0 via 192.174.26.1
 ```
 
-// tom.txt
+
+## CIDR (Classless Inter Domain Routing) di GNS3
+
+Menggabungkan subnet-subnet paling bawah dalam topologi, berikut penggabungannya:
+
+![Topologi-Class-CIDR.jpg](img/Topologi-Class-CIDR.jpg)
+
+Sehingga di dapatkan berikut pohon pembagian IP berdasarkan penggabungan subnet yang telah dilakukan:
+
+![CIDR-Tree.jpg](img/CIDR-Tree.jpg)
+
+config:
+
+**FOOSHA**
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+
+auto eth1
+iface eth1 inet static
+address 192.174.64.1
+netmask 255.255.252.0
+
+auto eth2
+iface eth2 inet static
+address 192.174.192.1
+netmask 255.255.255.252
+
+auto eth3
+iface eth3 inet static
+address 192.174.32.1
+netmask 255.255.255.252
+```
+**WATER7**
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 192.174.192.2
+netmask 255.255.255.252
+gateway 192.174.192.1
+
+auto eth1
+iface eth1 inet static
+address 192.174.160.1
+netmask 255.255.252.0
+
+auto eth2
+iface eth2 inet static
+address 192.174.144.1
+netmask 255.255.255.252
+```
+**PUCCI**
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 192.174.144.2
+netmask 255.255.255.252
+gateway 192.174.144.1
+
+auto eth1
+iface eth1 inet static
+address 192.174.136.1
+netmask 255.255.255.128
+
+auto eth2
+iface eth2 inet static
+address 192.174.128.1
+netmask 255.255.248.0
+```
+**GUANHAO**
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 192.174.32.2
+netmask 255.255.255.252
+gateway 192.174.32.1
+
+auto eth1
+iface eth1 inet static
+address 192.174.20.1
+netmask 255.255.252.0
+
+auto eth2
+iface eth2 inet static
+address 192.174.8.157
+netmask 255.255.255.252
+
+auto eth3
+iface eth3 inet static
+address 192.174.16.1
+netmask 255.255.254.0
+```
+**ALABASTA**
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 192.174.16.2
+netmask 255.255.254.0
+gateway 192.174.16.1
+
+auto eth1
+iface eth1 inet static
+address 192.174.18.1
+netmask 255.255.255.240
+```
+**OIMO**
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 192.174.8.158
+netmask 255.255.255.252
+gateway 192.174.8.157
+
+auto eth1
+iface eth1 inet static
+address 192.174.4.1
+netmask 255.255.255.0
+```
+**SEAST ONE**
+```
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+address 192.174.4.2
+netmask 255.255.255.0
+gateway 192.174.4.1
+
+auto eth1
+iface eth1 inet static
+address 192.174.0.1
+netmask 255.255.252.0
+```
+
+Agar UML dapat mengakses internet, pada UML FOOSHA diketikkan perintah ```iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE -s 192.174.0.0/16```
+
+Karena di UML setiap ada restart, route akan hilang, maka perintah menambahkan route disimpan dalam sebuah file bash, misal kita simpan dengan nama route.sh, berarti ketikkan perintah nano route.sh dan tambahkan route berikut untuk keempat UML:
+**FOOSHA**
+```
+#Lewat Water7
+route add -net 192.174.160.0 netmask 255.255.252.0 gw 192.174.192.2
+route add -net 192.174.144.0 netmask 255.255.255.252 gw 192.174.192.2
+route add -net 192.174.128.0 netmask 255.255.248.0 gw 192.174.192.2
+route add -net 192.174.136.0 netmask 255.255.255.128 gw 192.174.192.2
+
+#Lewat Guanhao
+route add -net 192.174.0.0 netmask 255.255.252.0 gw 192.174.32.2
+route add -net 192.174.4.0 netmask 255.255.255.0 gw 192.174.32.2
+route add -net 192.174.8.156 netmask 255.255.255.252 gw 192.174.32.2
+route add -net 192.174.20.0 netmask 255.255.252.0 gw 192.174.32.2
+route add -net 192.174.16.0 netmask 255.255.254.0 gw 192.174.32.2
+route add -net 192.174.18.0 netmask 255.255.255.240 gw 192.174.32.2
+```
+**WATER7**
+```
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.174.192.1
+
+route add -net 192.174.136.0 netmask 255.255.255.128 gw 192.174.144.2
+route add -net 192.174.128.0 netmask 255.255.248.0 gw 192.174.144.2
+```
+**PUCCI**
+```
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.174.144.1
+```
+**GUANHAO**
+```
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.174.32.1
+
+#Lewat Oimo
+route add -net 192.174.4.0 netmask 255.255.255.0 gw 192.174.8.158
+route add -net 192.174.0.0 netmask 255.255.252.0 gw 192.174.8.158
+
+#Lewat Alabasta
+route add -net 192.174.18.0 netmask 255.255.255.240 gw 192.174.16.2
+```
+**ALABASTA**
+
+**OIMO**
+```
+route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.174.8.156
+route add -net 192.174.0.0 netmask 255.255.248.0 gw 192.174.4.2
+```
+**SEAST ONE**
+
+Untuk menjalankan bash script pada UML, menggunakan perintah ```source```, sehingga untuk menjalankan ```route.sh``` dengan perintah ```source route.sh```.
